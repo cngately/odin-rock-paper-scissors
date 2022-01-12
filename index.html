@@ -6,59 +6,74 @@
     <title>Rock Paper Scissors</title>
   </head>
   <body>
-    <h2>Open the console to play</h2>
+    <button>rock</button>
+    <button>paper</button>
+    <button>scissors</button>
+    <div class="results">Chose your move!</div>
+    <div class="score">0 - 0</div>
   </body>
   <script>
     const plays = ["rock", "paper", "scissors"];
     function getComputerSelection() {
-      return plays[Math.round(Math.random() * plays.length)];
+      return plays[Math.floor(Math.random() * plays.length)];
     }
     
+    function getWinner(playerSelection, computerSelection) {
+      const tie = 'It\s a tie!', win = 'You win!', lose = 'You lose!';
+
+      if(playerSelection === 'rock') {
+        switch(computerSelection) {
+          case 'rock': return tie;
+          case 'paper': computerScore++; return lose;
+          case 'scissors': playerScore++; return win;
+        }
+      } else if (playerSelection === 'paper') {
+        switch(computerSelection) {
+          case 'paper': return tie;
+          case 'scissors': computerScore++; return lose;
+          case 'rock': playerScore++; return win;
+        }
+      } else {
+        switch(computerSelection) {
+          case 'scissors': return tie;
+          case 'rock': computerScore++; return lose;
+          case 'paper': playerScore++; return win;
+        }
+      }
+    }
+
     function playRound(playerSelection, computerSelection) {
-      if (playerSelection === computerSelection) return "It's a tie!";
-      else if (playerSelection === "rock") {
-        if (computerSelection === "scissors") return "You Win! Rock beats Scissors";
-          return "You Lose! Paper beats Rock";
-      }
-      else if (playerSelection === "paper") {
-        if (computerSelection === "rock") return "You Win! Paper beats Rock";
-          return "You Lose! Scissors beats Paper";
-      }
-      else if (playerSelection === "scissors") {
-        if (computerSelection === "paper") return "You Win! Scissors beats Paper";
-          return "You Lose! Rock beats Scissors";
-      }
-      else { return "Improper player selection"; }
-    }
-    
-    function getPlayerSelection() {
-      let selection = prompt("Type your move!");
-      selection = selection.trim().toLowerCase();
+      let msg = `The computer selected ${computerSelection}. `;
       
-      if (plays.includes(selection)) return selection;
-      else {
-        console.log("You must choose: rock, paper, or scissors");
-        return getPlayerSelection();
+      msg += getWinner(playerSelection, computerSelection);
+
+      return msg;
+    }
+
+    const score = document.querySelector('.score');
+    let playerScore = 0;
+    let computerScore = 0;
+
+    function updateScore() {
+      score.innerText = `${playerScore} - ${computerScore}`;
+
+      if (playerScore === 5) {
+        results.innerText = 'You won the match!';
+        playerScore = 0;
+        computerScore = 0;
+      }
+      if (computerScore === 5) {
+        results.innerText = 'You lost the match!';
+        playerScore = 0;
+        computerScore = 0;
       }
     }
     
-    function game() {
-      const rounds = 5;
-      let playerScore = 0;
-      let computerScore = 0;
-      
-      for (let i = 0; i < rounds; i++) {
-        const results = playRound(getPlayerSelection(), getComputerSelection());
-        console.log(results);
-        if (results.includes("You Win!")) playerScore++;
-        else if (results.includes("You Lose!")) computerScore++;
-      }
-        
-      if (playerScore > computerScore) console.log(`You Won! ${playerScore} - ${computerScore}`);
-      else if (computerScore > playerScore) console.log(`You Lost! ${computerScore} - ${playerScore}`);
-      else { console.log(`The game was tied! ${playerScore} - ${computerScore}`); }
-    }
-    
-    console.log("Type game(); to begin.");
+    const btns = document.querySelectorAll('button');
+    const results = document.querySelector('.results');
+    btns.forEach(btn => btn.addEventListener('click', e => {
+      results.innerText = playRound(btn.innerText, getComputerSelection());
+      updateScore();
+    }));
   </script>
 </html>
